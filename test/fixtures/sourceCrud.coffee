@@ -15,7 +15,7 @@ module.exports =
 
   getById: (req, res) ->
     source = _.find sources, (s) -> s.id is req.params.id
-    return res.send 404 unless source?
+    return res.status(404).end() unless source?
     res.json source
 
   update: (req, res) ->
@@ -30,7 +30,7 @@ module.exports =
     source = _.find sources, (s) -> s.id is req.params.id
     return res.send 404 unless source?
     sources.splice sources.indexOf(source), 1
-    res.send 204
+    res.status(204).end()
 
   stat: (req, res) ->
     res.json

@@ -3,5 +3,5 @@
 module.exports = () ->
   # create the according express errorHandler middleware.
   return (err, req, res, next) ->
-    error = if err instanceof Error then err else new Error err 
-    res.json(error.status or 400, {message: error.message})
+    error = if err instanceof Error then err else new Error err
+    res.status(error.status or 400).json(error.message)

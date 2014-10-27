@@ -200,6 +200,8 @@ module.exports = (app) ->
   # Express middleware for validating incoming request.
   middleware = (req, res, next) ->
     # first get the matching route
+
+    # TODO - matchRequest doesn't exist here - this is almost certainly related to app.router changes...
     route = req.app._router.matchRequest(req)
     # only for known urls and methods
     if route and route.path of @handle.routes and req.method.toUpperCase() of @handle.routes[route.path]

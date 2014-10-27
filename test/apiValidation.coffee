@@ -1,5 +1,9 @@
 require 'js-yaml'
 express = require 'express'
+morgan = require 'morgan'
+cookieParser = require 'cookie-parser'
+methodOverride = require 'express-method-override'
+bodyParser = require 'body-parser'
 assert = require('chai').assert
 request = require 'request'
 http = require 'http'
@@ -100,8 +104,10 @@ describe 'API validation tests', ->
     assert.throws ->
       app = express()
       # configured to use swagger generator
-      app.use(express.bodyParser())
-        .use(express.methodOverride())
+      app.use(cookieParser())
+        .use(methodOverride())
+        .use(bodyParser.json())
+        .use(bodyParser.urlencoded({extended:true}))
         .use(swagger.generator app,
           apiVersion: '1.0'
           basePath: root
@@ -119,8 +125,9 @@ describe 'API validation tests', ->
     before (done) ->
       app = express()
       # configured to use swagger generator
-      app.use(express.bodyParser())
-        .use(express.methodOverride())
+      app.use(bodyParser.json())
+        .use(bodyParser.urlencoded({extended: true}))
+        .use(methodOverride())
         .use(swagger.generator app,
           apiVersion: '1.0'
           basePath: "#{root}/basepath"
@@ -151,8 +158,8 @@ describe 'API validation tests', ->
       assert.doesNotThrow ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -167,8 +174,8 @@ describe 'API validation tests', ->
       assert.throws ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -184,8 +191,8 @@ describe 'API validation tests', ->
       assert.throws ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -201,8 +208,8 @@ describe 'API validation tests', ->
       assert.throws ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -218,8 +225,8 @@ describe 'API validation tests', ->
       assert.doesNotThrow ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -234,8 +241,8 @@ describe 'API validation tests', ->
       assert.throws ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -251,8 +258,8 @@ describe 'API validation tests', ->
       assert.throws ->
         app = express()
         # configured to use swagger generator
-        app.use(express.bodyParser())
-          .use(express.methodOverride())
+        app.use(bodyParser.json())
+          .use(methodOverride())
           .use(swagger.generator app,
             apiVersion: '1.0'
             basePath: root
@@ -270,8 +277,8 @@ describe 'API validation tests', ->
     before (done) ->
       app = express()
       # configured to use swagger generator
-      app.use(express.bodyParser())
-        .use(express.methodOverride())
+      app.use(bodyParser.json())
+        .use(methodOverride())
         .use(swagger.generator app,
           apiVersion: '1.0'
           basePath: root

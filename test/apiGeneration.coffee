@@ -1,5 +1,9 @@
 require 'js-yaml'
 express = require 'express'
+morgan = require 'morgan'
+cookieParser = require 'cookie-parser'
+methodOverride = require 'express-method-override'
+bodyParser = require 'body-parser'
 assert = require('chai').assert
 request = require 'request'
 http = require 'http'
@@ -563,9 +567,10 @@ describe 'API generation tests', ->
   it 'should preserve swaggerVersion', (done) ->
     # given a server with api and custom descriptor path
     app = express()
-    app.use(express.cookieParser())
-      .use(express.methodOverride())
-      .use(express.bodyParser())
+    app.use(cookieParser())
+      .use(methodOverride())
+      .use(bodyParser.urlencoded({extended:true}))
+      .use(bodyParser.json())
       .use(swagger.generator(app,
         swaggerVersion: '1.0'
         apiVersion: '1.0'
@@ -596,9 +601,10 @@ describe 'API generation tests', ->
   it 'should customize the generated descriptor path', (done) ->
     # given a server with api and custom descriptor path
     app = express()
-    app.use(express.cookieParser())
-      .use(express.methodOverride())
-      .use(express.bodyParser())
+    app.use(cookieParser())
+      .use(methodOverride())
+      .use(bodyParser.urlencoded({extended:true}))
+      .use(bodyParser.json())
       .use(swagger.generator(app,
         apiVersion: '1.0'
         basePath: root
@@ -633,9 +639,10 @@ describe 'API generation tests', ->
   it 'should allow wired and not wired resources', (done) ->
     # given a server with wired and not wired api
     app = express()
-    app.use(express.cookieParser())
-      .use(express.methodOverride())
-      .use(express.bodyParser())
+    app.use(cookieParser())
+      .use(methodOverride())
+      .use(bodyParser.urlencoded({extended:true})) 
+      .use(bodyParser.json())
       .use(swagger.generator(app,
         apiVersion: '1.0'
         basePath: root
@@ -697,9 +704,10 @@ describe 'API generation tests', ->
     # given a started server
     before (done) ->
       app = express()
-      app.use(express.cookieParser())
-        .use(express.methodOverride())
-        .use(express.bodyParser())
+      app.use(cookieParser())
+        .use(methodOverride())
+        .use(bodyParser.urlencoded({extended:true})) 
+        .use(bodyParser.json())
         .use(swagger.generator(app,
           apiVersion: '1.0'
           basePath: root
@@ -772,9 +780,14 @@ describe 'API generation tests', ->
       app = express()
       # configured to use swagger generator
       try
-        app.use(express.cookieParser())
-          .use(express.methodOverride())
-          .use(express.bodyParser())
+        app.use(morgan('dev'))
+        app.use(cookieParser())
+          .use(methodOverride())
+          .use(bodyParser.urlencoded({extended: true}))
+          .use(bodyParser.json())
+          .use (err, req, res, next) ->
+            console.error err.stack
+            res.json(500, {ERROR: 'Internal server error.'} )
           .use(swagger.generator(app,
             apiVersion: '1.0'
             basePath: root
@@ -789,6 +802,23 @@ describe 'API generation tests', ->
           .use(swagger.validator(app))
       catch err
         return done err.stack
+
+      app.get('*', (req, res, next) ->
+        err = new Error()
+        err.status = 404
+        next err
+      )
+
+      app.use((err, req, res, next) ->
+        if (err.status != 404)
+          return next()
+
+        res.send(err.message || '** no unicorns here **')
+      )
+
+      app.set('port', port)
+
+      console.log("listening on port '%s', host '%s'", port, host)
 
       server = http.createServer app
       server.listen port, host, _.defer(done)

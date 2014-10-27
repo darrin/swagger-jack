@@ -1,5 +1,6 @@
 _ = require('underscore')
 utils = require('./utils')
+express = require('express')
 
 # List of lowercase raw types that are not validated as models.
 rawTypes = ['void', 'int', 'long', 'integer', 'float', 'double', 'number', 'string', 'boolean', 'array', 'any', 'null', 'byte', 'file']
@@ -223,12 +224,16 @@ module.exports = (app, descriptor, resources, options = {}) ->
 
   try
     # enrich the descriptor with apis
-    routes = addRoutes(basePath, descriptor, resources)
+    routes = addRoutes('', descriptor, resources)
     # Creates middlewares, after a slight delay to let the router being registered
     # Otherwise, the generator middleware will be registered after the added routes
     _.defer(() ->
+      router = express.Router();
       for route in routes
-        app[route.method](route.path, route.middleware)
+        # console.log("Adding '%s' for '%s'", route.method, route.path)
+        router[route.method](route.path, route.middleware)
+      # console.log("Registering router for basepath '%s'", basePath)
+      app.use(basePath, router);
     )
 
     # Add descriptor to express application for other middlewares
